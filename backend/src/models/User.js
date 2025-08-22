@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-
+// UserSchema 
 const userSchema = new mongoose.Schema({
     fullName: {
         type: String,
@@ -44,7 +44,9 @@ const userSchema = new mongoose.Schema({
         }
     ]
 },{ timestamps:true});
-// TODO: pre hook work left 
+
+
+// Password hashing
 userSchema.pre("save", async function(next) {
     if (!this.isModified("password")) return next(); 
     try {
@@ -55,6 +57,12 @@ userSchema.pre("save", async function(next) {
         next(error);
     }
 });
+
+// Password match
+userSchema.methods.matchPassword = async function (enterdPassword) {
+    const isPasswordCorrect = await bcrypt.compare(enterdPassword, this.password);
+    return isPasswordCorrect; 
+}
 
 const User = mongoose.model("User", userSchema);
 
