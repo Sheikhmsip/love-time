@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router";
+import { Routes, Route, Navigate } from "react-router";
 import HomePage from "./pages/HomePage.jsx";
 import SignUpPage from "./pages/SignUpPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
@@ -13,8 +13,12 @@ import { axiosInstance } from "./lib/axios.js";
 const App = () => {
   // Tanstake query
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["todos"],
+  const {
+    data: authData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["authUser"],
     queryFn: async () => {
       const res = await axiosInstance.get("/auth/me");
 
@@ -22,18 +26,60 @@ const App = () => {
     },
     retry: false,
   });
-  console.log(data);
+  const authUser = authData?.user;
   return (
     <div className="h-screen" data-theme="night">
       <Routes>
-        <Route path="/" element={<HomePage></HomePage>}></Route>
-        <Route path="/singup" element={<SignUpPage></SignUpPage>}></Route>
-        <Route path="/login" element={<LoginPage></LoginPage>}></Route>
+        <Route
+          path="/"
+          element={
+            authUser ? (
+              <HomePage></HomePage>
+            ) : (
+              <Navigate to={"/login"}></Navigate>
+            )
+          }></Route>
+        <Route
+          path="/signup"
+          element={
+            !authUser ? (
+              <SignUpPage></SignUpPage>
+            ) : (
+              <Navigate to={"/"}></Navigate>
+            )
+          }></Route>
+        <Route
+          path="/login"
+          element={
+            !authUser ? <LoginPage></LoginPage> : <Navigate to={"/"}></Navigate>
+          }></Route>
         <Route
           path="/notifications"
-          element={<NotificationsPage></NotificationsPage>}></Route>
-        <Route path="/call" element={<CallPage></CallPage>}></Route>
-        <Route path="/chat" element={<ChatPage></ChatPage>}></Route>
+          element={
+            authUser ? (
+              <NotificationsPage></NotificationsPage>
+            ) : (
+              <Navigate to={"/login"}></Navigate>
+            )
+          }></Route>
+        <Route
+          path="/call"
+          element={
+            authUser ? (
+              <CallPage></CallPage>
+            ) : (
+              <Navigate to={"/login"}></Navigate>
+            )
+          }></Route>
+        <Route
+          path="/chat"
+          element={
+            authUser ? (
+              <ChatPage></ChatPage>
+            ) : (
+              <Navigate to={"/login"}></Navigate>
+            )
+          }></Route>
         <Route
           path="/onboarding"
           element={<OnboardingPage></OnboardingPage>}></Route>
