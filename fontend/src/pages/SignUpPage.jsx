@@ -1,6 +1,8 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ShipWheelIcon } from "lucide-react";
 import React, { useState } from "react";
 import { Link } from "react-router";
+import { signup } from "../lib/api";
 
 const SignUpPage = () => {
   const [signupData, setSignupData] = useState({
@@ -8,9 +10,21 @@ const SignUpPage = () => {
     email: "",
     password: "",
   });
+  const queryClient = useQueryClient();
+
+  // mutate:signupMutation => rename the mutate
+  const {
+    mutate: signupMutation,
+    isPending,
+    error,
+  } = useMutation({
+    mutationFn: signup,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["authUser"] }),
+  });
 
   const handleSignup = (e) => {
     e.preventDefault();
+    signupMutation(signupData);
   };
   return (
     <div
@@ -26,6 +40,14 @@ const SignUpPage = () => {
               Lovetime
             </span>
           </div>
+
+          {/* ERROR MESSAGE */}
+
+          {error && (
+            <div className="alert alert-error mb-4">
+              <span>{error.response.data.message}</span>
+            </div>
+          )}
           <div className="w-full">
             <form onSubmit={handleSignup}>
               <div className="space-y-4">
@@ -69,7 +91,7 @@ const SignUpPage = () => {
                       onChange={(e) =>
                         setSignupData({
                           ...signupData,
-                          emial: e.target.value,
+                          email: e.target.value,
                         })
                       }
                       required></input>
@@ -114,9 +136,11 @@ const SignUpPage = () => {
                     </label>
                   </div>
                 </div>
+
                 <button className="btn btn-primary w-full" type="submit">
-                  Create Account
+                  {isPending ? (<> <span className="loading loading-spinner loading-xs"></span> Lodaing...</>) : (<>Create Account</>)}
                 </button>
+
                 <div className="text-center mt-4">
                   <p className="text-sm">
                     Already have an account?{" "}
@@ -134,17 +158,25 @@ const SignUpPage = () => {
         {/* SIGNUP FORM - RIGHT SIDE */}
 
         <div className="hidden lg:flex w-full lg:w-1/2 bg-primary/10 items-center justify-center">
-        <div className="max-w-md p-8">
-          {/* Illustration */}
-          <div className="relative aspect-square max-w-sm mx-auto">
-            <img src="/signupImg.png" alt="Language connection illustration" className="w-full h-full"></img>
+          <div className="max-w-md p-8">
+            {/* Illustration */}
+            <div className="relative aspect-square max-w-sm mx-auto">
+              <img
+                src="/signupImg.png"
+                alt="Language connection illustration"
+                className="w-full h-full"></img>
+            </div>
+            <div className="text-center space-y-3 mt-6">
+              <h2 className="text-xl font-semibold">
+                Connect with language partners worldwide
+              </h2>
+              <p className="opacity-70">
+                {" "}
+                Practice conversations, make friends, and improve your language
+                skills with your love one
+              </p>
+            </div>
           </div>
-          <div className="text-center space-y-3 mt-6">
-            <h2 className="text-xl font-semibold">Connect with language partners worldwide</h2>
-            <p className="opacity-70"> Practice conversations, make friends, and improve your language skills with your love one</p>
-          </div>
-        </div>
-
         </div>
       </div>
     </div>
