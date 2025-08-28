@@ -13,6 +13,9 @@ import { Navigate, Route, Routes } from "react-router";
 const App = () => {
   const { isLoading, authUser } = useAuthUser();
 
+  const isAuthenticated = Boolean(authUser)
+  const isOnboarded = authUser?.isOnboarded
+
   if (isLoading) {
     return <PageLoader></PageLoader>;
   }
@@ -22,16 +25,16 @@ const App = () => {
         <Route
           path="/"
           element={
-            authUser ? (
+            isAuthenticated && isOnboarded ? (
               <HomePage></HomePage>
             ) : (
-              <Navigate to={"/login"}></Navigate>
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"}></Navigate>
             )
           }></Route>
         <Route
           path="/signup"
           element={
-            !authUser ? (
+            !isAuthenticated ? (
               <SignUpPage></SignUpPage>
             ) : (
               <Navigate to={"/"}></Navigate>
@@ -40,12 +43,12 @@ const App = () => {
         <Route
           path="/login"
           element={
-            !authUser ? <LoginPage></LoginPage> : <Navigate to={"/"}></Navigate>
+            !isAuthenticated ? <LoginPage></LoginPage> : <Navigate to={"/"}></Navigate>
           }></Route>
         <Route
           path="/notifications"
           element={
-            authUser ? (
+            isAuthenticated ? (
               <NotificationsPage></NotificationsPage>
             ) : (
               <Navigate to={"/login"}></Navigate>
@@ -54,7 +57,7 @@ const App = () => {
         <Route
           path="/call"
           element={
-            authUser ? (
+            isAuthenticated ? (
               <CallPage></CallPage>
             ) : (
               <Navigate to={"/login"}></Navigate>
@@ -63,7 +66,7 @@ const App = () => {
         <Route
           path="/chat"
           element={
-            authUser ? (
+            isAuthenticated ? (
               <ChatPage></ChatPage>
             ) : (
               <Navigate to={"/login"}></Navigate>
@@ -71,7 +74,11 @@ const App = () => {
           }></Route>
         <Route
           path="/onboarding"
-          element={<OnboardingPage></OnboardingPage>}></Route>
+          element={isAuthenticated? (
+            !isOnboarded ? (
+              <OnboardingPage></OnboardingPage>
+            ) : (<Navigate to="/"></Navigate>)
+          ) : (<Navigate to="/login"></Navigate>)}></Route>
       </Routes>
 
       <Toaster></Toaster>
