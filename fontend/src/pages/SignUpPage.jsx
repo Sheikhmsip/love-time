@@ -1,8 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ShipWheelIcon } from "lucide-react";
 import React, { useState } from "react";
 import { Link } from "react-router";
-import { signup } from "../lib/api";
+import useSignup from "../hooks/useSignup";
 
 const SignUpPage = () => {
   const [signupData, setSignupData] = useState({
@@ -10,22 +9,15 @@ const SignUpPage = () => {
     email: "",
     password: "",
   });
-  const queryClient = useQueryClient();
 
-  // mutate:signupMutation => rename the mutate
-  const {
-    mutate: signupMutation,
-    isPending,
-    error,
-  } = useMutation({
-    mutationFn: signup,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["authUser"] }),
-  });
+  // User SignUp Hook
+  const { isPending, error, signupMutation } = useSignup();
 
   const handleSignup = (e) => {
     e.preventDefault();
     signupMutation(signupData);
   };
+
   return (
     <div
       className="h-screen flex items-center justify-center p-4 sm:p-6 md:p-8"
@@ -138,7 +130,15 @@ const SignUpPage = () => {
                 </div>
 
                 <button className="btn btn-primary w-full" type="submit">
-                  {isPending ? (<> <span className="loading loading-spinner loading-xs"></span> Lodaing...</>) : (<>Create Account</>)}
+                  {isPending ? (
+                    <>
+                      {" "}
+                      <span className="loading loading-spinner loading-xs"></span>{" "}
+                      Lodaing...
+                    </>
+                  ) : (
+                    <>Create Account</>
+                  )}
                 </button>
 
                 <div className="text-center mt-4">

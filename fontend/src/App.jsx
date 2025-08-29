@@ -37,13 +37,13 @@ const App = () => {
             !isAuthenticated ? (
               <SignUpPage></SignUpPage>
             ) : (
-              <Navigate to={"/"}></Navigate>
+              <Navigate to={isOnboarded? "/" : "/onboarding"}></Navigate>
             )
           }></Route>
         <Route
           path="/login"
           element={
-            !isAuthenticated ? <LoginPage></LoginPage> : <Navigate to={"/"}></Navigate>
+            !isAuthenticated ? <LoginPage></LoginPage> : <Navigate to={isOnboarded? "/" : "/onboarding"}></Navigate>
           }></Route>
         <Route
           path="/notifications"
