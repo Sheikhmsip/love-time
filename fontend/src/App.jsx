@@ -11,25 +11,32 @@ import PageLoader from "./components/PageLoader.jsx";
 import useAuthUser from "./hooks/useAuthUser.jsx";
 import { Navigate, Route, Routes } from "react-router";
 import Layout from "./components/Layout.jsx";
+import { useThemeStore } from "./store/useThemeStore.js";
 const App = () => {
-  const { isLoading, authUser } = useAuthUser();
+  // Theme Store
+  const { theme } = useThemeStore();
 
-  const isAuthenticated = Boolean(authUser)
-  const isOnboarded = authUser?.isOnboarded
+  // Authentication function
+  const { isLoading, authUser } = useAuthUser();
+  const isAuthenticated = Boolean(authUser);
+  const isOnboarded = authUser?.isOnboarded;
 
   if (isLoading) {
     return <PageLoader></PageLoader>;
   }
   return (
-    <div className="h-screen" data-theme="forest">
+    <div className="h-screen" data-theme={theme}>
       <Routes>
         <Route
           path="/"
           element={
             isAuthenticated && isOnboarded ? (
-              <Layout showSidebar={true}><HomePage></HomePage></Layout>
+              <Layout showSidebar={true}>
+                <HomePage></HomePage>
+              </Layout>
             ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"}></Navigate>
+              <Navigate
+                to={!isAuthenticated ? "/login" : "/onboarding"}></Navigate>
             )
           }></Route>
         <Route
@@ -38,13 +45,17 @@ const App = () => {
             !isAuthenticated ? (
               <SignUpPage></SignUpPage>
             ) : (
-              <Navigate to={isOnboarded? "/" : "/onboarding"}></Navigate>
+              <Navigate to={isOnboarded ? "/" : "/onboarding"}></Navigate>
             )
           }></Route>
         <Route
           path="/login"
           element={
-            !isAuthenticated ? <LoginPage></LoginPage> : <Navigate to={isOnboarded? "/" : "/onboarding"}></Navigate>
+            !isAuthenticated ? (
+              <LoginPage></LoginPage>
+            ) : (
+              <Navigate to={isOnboarded ? "/" : "/onboarding"}></Navigate>
+            )
           }></Route>
         <Route
           path="/notifications"
@@ -75,11 +86,17 @@ const App = () => {
           }></Route>
         <Route
           path="/onboarding"
-          element={isAuthenticated? (
-            !isOnboarded ? (
-              <OnboardingPage></OnboardingPage>
-            ) : (<Navigate to="/"></Navigate>)
-          ) : (<Navigate to="/login"></Navigate>)}></Route>
+          element={
+            isAuthenticated ? (
+              !isOnboarded ? (
+                <OnboardingPage></OnboardingPage>
+              ) : (
+                <Navigate to="/"></Navigate>
+              )
+            ) : (
+              <Navigate to="/login"></Navigate>
+            )
+          }></Route>
       </Routes>
 
       <Toaster></Toaster>
