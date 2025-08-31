@@ -27,7 +27,7 @@ export async function getMyFriends(req, res) {
     const user = await User.findById(req.user.id)
       .select("friends")
       .populate(
-        "firends",
+        "friends",
         "fullName profilePic nativeLanguage learningLanguage"
       );
 
