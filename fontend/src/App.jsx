@@ -69,15 +69,15 @@ const App = () => {
             )
           }></Route>
         <Route
-          path="/call"
+          path="/call/:id"
           element={
-            isAuthenticated ? (
+            isAuthenticated && isOnboarded ? (
               <CallPage></CallPage>
             ) : (
-              <Navigate to={"/login"}></Navigate>
+              <Navigate to={ !isAuthenticated? "/login" : "/onboarding"}></Navigate>
             )
           }></Route>
-          
+
         <Route
           path="/chat/:id"
           element={
